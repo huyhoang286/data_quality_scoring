@@ -1,0 +1,4 @@
+# Danh sách thư viện
+pandas
+PyYAML
+openpyxl

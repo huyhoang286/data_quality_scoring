@@ -1,0 +1,26 @@
+# Cấu hình luật cho tập dữ liệu mẫu
+dataset_name: "customer_data"
+
+# Tính đầy đủ (Completeness)
+completeness:
+  check_missing_values:
+    - column: "email"
+      allowed_null_percentage: 0.0
+    - column: "phone_number"
+      allowed_null_percentage: 10.0
+
+# Tính chính xác (Accuracy)
+accuracy:
+  check_format:
+    - column: "email"
+      regex: '^[\w\.-]+@[\w\.-]+\.\w+$'
+  check_range:
+    - column: "age"
+      min: 18
+      max: 100
+
+# Tính nhất quán (Consistency)
+consistency:
+  check_logic:
+    - rule_name: "valid_subscription_dates"
+      condition: "end_date >= start_date"
