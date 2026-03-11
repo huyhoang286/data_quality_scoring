@@ -1,8 +1,8 @@
 import pandas as pd
 
 class RuleEngine:
+    # Khởi tạo RuleEngine với bộ luật đọc từ YAML.
     def __init__(self, rules: dict):
-        """Khởi tạo RuleEngine với bộ luật (dictionary) đọc từ YAML."""
         self.rules = rules
         # Nơi lưu trữ kết quả quét lỗi
         self.results = {
@@ -11,31 +11,28 @@ class RuleEngine:
             "consistency": {}
         }
 
+    # Thực thi toàn bộ các luật kiểm tra trên DataFrame.
     def run(self, df: pd.DataFrame) -> dict:
-        """Thực thi toàn bộ các luật kiểm tra trên DataFrame."""
-        print("\n[SYSTEM] Bắt đầu thực thi Rule Engine...")
-        self.df = df.copy() # Tạo bản sao để không làm hỏng dữ liệu gốc
-        
+        self.df = df.copy() 
         self._check_completeness()
         self._check_accuracy()
         self._check_consistency()
         
-        print("[SUCCESS] Đã quét xong toàn bộ dữ liệu!")
+        print("Đã quét xong toàn bộ dữ liệu!")
         return self.results
 
+    # Kiểm tra tính đầy đủ (Missing values)
     def _check_completeness(self):
-        """Kiểm tra tính đầy đủ (Missing values)."""
         rules = self.rules.get('completeness', {}).get('check_missing_values', [])
         for rule in rules:
             col = rule['column']
-            allowed_pct = rule['allowed_null_percentage']
+            allowed_pct = rule['allowed_null_percentage'] #Tỉ lệ cho phép thiếu
             
             if col in self.df.columns:
                 missing_count = self.df[col].isna().sum()
                 total_count = len(self.df)
                 missing_pct = (missing_count / total_count) * 100
                 
-                # Đánh giá đạt/không đạt
                 passed = missing_pct <= allowed_pct
                 self.results["completeness"][col] = {
                     "missing_count": int(missing_count),
@@ -43,8 +40,8 @@ class RuleEngine:
                     "passed": bool(passed)
                 }
 
+    # Kiểm tra tính chính xác (Format Regex và Range).
     def _check_accuracy(self):
-        """Kiểm tra tính chính xác (Format Regex và Range)."""
         # 1. Kiểm tra định dạng (Regex)
         format_rules = self.rules.get('accuracy', {}).get('check_format', [])
         for rule in format_rules:
