@@ -1,4 +1,5 @@
 from core.ingestion import DataIngestor
+from core.profiler import Profiler
 from core.rule_engine import RuleEngine
 from core.scorer import Scorer
 import json
@@ -7,20 +8,30 @@ def main():
     config_file = "configs/default_rules.yaml"
     data_file = "sample_data.csv"
 
-    # 1. Nạp liệu
+    print(f"\n[SYSTEM] Khởi động công cụ Data Quality Scorer...")
+    print(f"[SYSTEM] Dữ liệu đầu vào: {data_file}")
+    
+    # Nạp liệu
     ingestor = DataIngestor(config_path=config_file)
     df = ingestor.load_data(data_path=data_file)
 
     if not df.empty:
-        # 2. Quét lỗi
+        # DATA PROFILING 
+        profiler = Profiler(df=df)
+        profile_report = profiler.run_profiling()
+        
+        print("\n--- THỐNG KÊ TỔNG QUAN ---")
+        print(json.dumps(profile_report["overall_stats"], indent=4, ensure_ascii=False))
+
+        # RULE-BASED ENGINE
         engine = RuleEngine(rules=ingestor.rules)
         validation_results = engine.run(df=df)
         
-        # 3. Chấm điểm
+        #SCORING 
         scorer = Scorer(validation_results=validation_results, total_rows=len(df))
         health_report = scorer.calculate_score()
         
-        # 4. In Báo cáo Sức khỏe (Dành cho người quản lý)
+        # In Báo cáo Sức khỏe cuối cùng
         print("\n================ BÁO CÁO SỨC KHỎE DỮ LIỆU ================")
         print(json.dumps(health_report, indent=4, ensure_ascii=False))
         print("==========================================================")
