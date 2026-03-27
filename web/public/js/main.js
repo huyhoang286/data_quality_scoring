@@ -172,6 +172,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
             const result = await response.json();
 
+            // Fix bug
+            if (result.error) {
+                alert(`Lỗi từ Thuật toán Python: ${result.error}`);
+                btnRunScoring.textContent = "🚀 Lưu cấu hình & Chấm điểm";
+                btnRunScoring.disabled = false;
+                return; 
+            }
+
             // Đổ dữ liệu ra Báo cáo
             document.getElementById('final-score').innerText = result.final_score;
             document.getElementById('score-comp').innerText = result.dimension_scores.completeness;

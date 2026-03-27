@@ -1,8 +1,12 @@
 rules:
   completeness:
     - column: id
-    - column: start_date
-    - column: end_date
+    - column: name
+    - column: phone_number
   accuracy:
     - column: email
       type: email
+    - column: age
+      type: range
+      min: 0
+      max: 10
