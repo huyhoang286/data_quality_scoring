@@ -23,9 +23,15 @@ def main():
         print("\n--- THỐNG KÊ TỔNG QUAN ---")
         print(json.dumps(profile_report["overall_stats"], indent=4, ensure_ascii=False))
 
+        print("\n--- THỐNG KÊ CHI TIẾT TỪNG CỘT ---")
+        print(json.dumps(profile_report["column_profiles"], indent=4, ensure_ascii=False))
+
         # RULE-BASED ENGINE
         engine = RuleEngine(rules=ingestor.rules)
         validation_results = engine.run(df=df)
+        
+        print("\n--- KẾT QUẢ QUÉT LỖI CHI TIẾT ---")
+        print(json.dumps(validation_results, indent=4, ensure_ascii=False))
         
         #SCORING 
         scorer = Scorer(validation_results=validation_results, total_rows=len(df))

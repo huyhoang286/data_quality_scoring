@@ -1,0 +1,8 @@
+rules:
+  completeness:
+    - column: id
+    - column: start_date
+    - column: end_date
+  accuracy:
+    - column: email
+      type: email

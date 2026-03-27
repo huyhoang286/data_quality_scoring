@@ -1,0 +1,61 @@
+doctype html
+html(lang="vi")
+  head
+    meta(charset="UTF-8")
+    meta(name="viewport", content="width=device-width, initial-scale=1.0")
+    title Data Quality 
+    link(rel="stylesheet", href="/css/style.css")
+  
+  body
+    header.navbar
+      h1 Data Quality 
+      p Trợ lý Đánh giá & Làm sạch Dữ liệu tự động
+
+    main.container
+      //- TẢI FILE DỮ LIỆU
+      section#upload-section.card
+        h2 1. Nạp tập dữ liệu (Data Ingestion)
+        div#drop-zone.drop-zone
+          span Kéo thả file CSV/Excel vào đây hoặc Click để duyệt file
+          input(type="file", id="file-input", accept=".csv, .xlsx", hidden)
+        
+        div#upload-status.status-message.hidden
+
+      section#rule-builder-section.card.hidden
+        div.header-actions
+          h2 2. Bảng cấu hình Luật (Rule Builder)
+          button#btn-ai-suggest.btn-ai Tự động gợi ý luật bằng AI
+        
+        p.subtitle Chọn các tiêu chí kiểm tra cho từng cột. Các ô có màu vàng là do AI gợi ý.
+
+        table#rule-table
+          thead
+            tr
+              th Tên cột
+              th Kiểu dữ liệu
+              th Luật áp dụng (Completeness / Accuracy)
+              th Thao tác
+          tbody#rule-tbody
+
+        div.footer-actions
+          button#btn-run-scoring.btn-primary Lưu cấu hình & Chấm điểm
+
+      //- BÁO CÁO KẾT QUẢ (REPORT)
+      section#report-section.card.hidden
+        h2 3. Báo cáo Sức khỏe Dữ liệu (Health Report)
+        
+        div.dashboard-grid
+          div.score-card
+            h3 Điểm Tổng hợp
+            div.score-circle
+              span#final-score 0
+            p#health-status-text Trạng thái: Đang tính toán...
+
+          div.details-card
+            h3 Chi tiết theo Tiêu chí
+            ul.metric-list
+              li Completeness (Tính đầy đủ): <span id="score-comp">0</span> điểm
+              li Accuracy (Tính chính xác): <span id="score-acc">0</span> điểm
+              li Consistency (Tính nhất quán): <span id="score-cons">0</span> điểm
+
+    script(src="/js/main.js")

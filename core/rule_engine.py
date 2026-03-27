@@ -77,15 +77,14 @@ class RuleEngine:
                     "passed": bool(invalid_count == 0)
                 }
 
+    #Kiểm tra tính nhất quán (Logic chéo giữa các cột).
     def _check_consistency(self):
-        """Kiểm tra tính nhất quán (Logic chéo giữa các cột)."""
         logic_rules = self.rules.get('consistency', {}).get('check_logic', [])
         for rule in logic_rules:
             rule_name = rule['rule_name']
-            condition = rule['condition'] # VD: "end_date >= start_date"
+            condition = rule['condition'] 
             
             try:
-                # Tiền xử lý: Ép kiểu datetime cho các cột có chữ 'date'
                 for col in self.df.columns:
                     if 'date' in col.lower():
                         self.df[col] = pd.to_datetime(self.df[col], errors='coerce')

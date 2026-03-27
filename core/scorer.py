@@ -29,11 +29,9 @@ class Scorer:
                 else:
                     invalid = rule_data.get("invalid_count", 0)
 
-                # Công thức: 100 - (% dòng lỗi)
                 rule_score = max(0, 100 - (invalid / self.total_rows * 100))
                 dimension_total_score += rule_score
 
-            # Điểm của 1 tiêu chí = Trung bình cộng điểm các luật bên trong nó
             dim_score = round(dimension_total_score / len(rules), 2)
             dimension_scores[dimension] = dim_score
             

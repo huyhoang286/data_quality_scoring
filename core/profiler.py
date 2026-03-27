@@ -14,7 +14,6 @@ class Profiler:
         return {
             "total_rows": int(len(self.df)),
             "total_columns": int(len(self.df.columns)),
-            # Ép kiểu float và làm tròn để dễ đọc
             "memory_usage_mb": float(round(self.df.memory_usage(deep=True).sum() / (1024**2), 2)),
             "duplicate_rows": int(self.df.duplicated().sum())
         }
@@ -34,7 +33,6 @@ class Profiler:
 
             # Nếu là dữ liệu Số (Numeric)
             if pd.api.types.is_numeric_dtype(series):
-                # Loại bỏ các ô NaN trước khi tính toán để tránh lỗi
                 clean_series = series.dropna()
                 if not clean_series.empty:
                     stats.update({
