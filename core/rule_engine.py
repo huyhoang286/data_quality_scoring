@@ -3,7 +3,11 @@ import pandas as pd
 class RuleEngine:
     # Khởi tạo RuleEngine với bộ luật đọc từ YAML.
     def __init__(self, rules: dict):
-        self.rules = rules
+        if 'rules' in rules:
+            self.rules = rules['rules']
+        else:
+            self.rules = rules
+            
         # Nơi lưu trữ kết quả quét lỗi
         self.results = {
             "completeness": {},

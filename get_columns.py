@@ -1,17 +1,24 @@
 import pandas as pd
-import sys
 import json
+import sys
+import io
+import os
+
+# UTF-8 cho Windows
+sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8')
+sys.stderr = io.TextIOWrapper(sys.stderr.buffer, encoding='utf-8')
 
 def get_columns(file_path):
     try:
-        if file_path.endswith('.csv'):
-            df = pd.read_csv(file_path)
-        elif file_path.endswith('.xlsx'):
-            df = pd.read_excel(file_path)
-        else:
-            return {"error": "Định dạng file không được hỗ trợ"}
+        if not os.path.exists(file_path):
+            return {"error": f"Không tìm thấy file tại: {file_path}"}
 
-        # Trích xuất tên cột và kiểu dữ liệu
+        # Đọc metadata
+        if file_path.endswith('.csv'):
+            df = pd.read_csv(file_path, nrows=0)
+        else:
+            df = pd.read_excel(file_path, nrows=0)
+        
         columns = [{"name": str(col), "type": str(df[col].dtype)} for col in df.columns]
         return columns
 
@@ -19,11 +26,12 @@ def get_columns(file_path):
         return {"error": str(e)}
 
 if __name__ == "__main__":
-    if len(sys.argv) < 2:
-        print(json.dumps({"error": "Thiếu đường dẫn file"}))
-        sys.exit(1)
-        
-    file_path = sys.argv[1]
-    result = get_columns(file_path)
-    
-    print(json.dumps(result))
+    try:
+        if len(sys.argv) > 1:
+            file_path = sys.argv[1]
+            result = get_columns(file_path)
+            print(json.dumps(result, ensure_ascii=False))
+        else:
+            print(json.dumps({"error": "Thiếu đường dẫn file"}))
+    except Exception as e:
+        print(json.dumps({"error": f"Lỗi hệ thống Python: {str(e)}"}))

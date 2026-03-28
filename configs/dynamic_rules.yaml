@@ -1,12 +1,19 @@
 rules:
   completeness:
-    - column: id
-    - column: name
-    - column: phone_number
+    check_missing_values:
+      - column: id
+        allowed_null_percentage: 0
+      - column: name
+        allowed_null_percentage: 0
   accuracy:
-    - column: email
-      type: email
-    - column: age
-      type: range
-      min: 0
-      max: 10
+    check_format:
+      - column: email
+        regex: ^(0|84)[0-9]{9}$
+      - column: phone_number
+        regex: ^[\w\.-]+@[\w\.-]+\.\w+$
+    check_range: []
+    check_allowed_values: []
+  consistency:
+    check_logic:
+      - rule_name: check_age_birthday_past
+        condition: birthday < today

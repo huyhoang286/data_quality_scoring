@@ -3,10 +3,12 @@ import io
 import json
 import argparse
 import warnings
+import os
 from core.ingestion import DataIngestor
 from core.rule_engine import RuleEngine
 from core.scorer import Scorer
 
+# UTF-8 cho luồng in ra của Windows
 sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8')
 sys.stderr = io.TextIOWrapper(sys.stderr.buffer, encoding='utf-8')
 
@@ -19,19 +21,20 @@ def main():
     args = parser.parse_args()
 
     try:
-        # Nạp dữ liệu và Luật
+        # Kiểm tra file tồn tại
+        if not os.path.exists(args.data):
+            print(json.dumps({"error": f"Không thấy file dữ liệu: {args.data}"}))
+            return
+
+        # 1. Nạp dữ liệu
         ingestor = DataIngestor(config_path=args.config)
         df = ingestor.load_data(data_path=args.data)
 
-        if df.empty:
-            print(json.dumps({"error": "Dữ liệu trống hoặc không hợp lệ"}, ensure_ascii=False))
-            return
-
-        # Quét lỗi
+        # 2. Chạy luật
         engine = RuleEngine(rules=ingestor.rules)
         validation_results = engine.run(df=df)
 
-        # Chấm điểm
+        # 3. Tính điểm
         scorer = Scorer(validation_results=validation_results, total_rows=len(df))
         health_report = scorer.calculate_score()
 

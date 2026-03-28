@@ -41,34 +41,42 @@ app.post('/api/upload', upload.single('file'), (req, res) => {
     }
     
     const filePath = req.file.path;
-    console.log(`[SYSTEM] Đã nhận file: ${req.file.filename}`);
-    console.log(`[SYSTEM] Đang gọi Python để đọc metadata...`);
+    // Chuyển đổi đường dẫn file về dạng chuẩn để tránh lỗi dấu gạch chéo trên Windows
+    const normalizedPath = filePath.replace(/\\/g, '/');
+    
+    console.log(`[DEBUG] Đang xử lý file: ${normalizedPath}`);
 
-    const pythonCommand = `python get_columns.py "${filePath}"`;
+    const pythonCommand = `python get_columns.py "${normalizedPath}"`;
 
     exec(pythonCommand, (error, stdout, stderr) => {
         if (error) {
-            console.error(`[LỖI PYTHON]: ${error.message}`);
-            return res.status(500).json({ error: 'Lỗi khi phân tích file dữ liệu' });
+            console.error(`[EXEC ERROR]: ${error.message}`);
+            return res.status(500).json({ error: "Không thể thực thi lệnh Python. Hãy kiểm tra cài đặt Python." });
+        }
+
+        if (stderr) {
+            console.error(`[PYTHON STDERR]: ${stderr}`);
         }
 
         try {
+            console.log(`[DEBUG] Python Output: ${stdout}`);
             const columns = JSON.parse(stdout);
 
             if (columns.error) {
+                console.error(`[LOGIC ERROR]: ${columns.error}`);
                 return res.status(400).json({ error: columns.error });
             }
 
             res.json({
-                message: 'Upload và phân tích thành công!',
+                message: 'Phân tích thành công!',
                 filename: req.file.filename,
-                filepath: filePath, 
+                filepath: normalizedPath,
                 columns: columns
             });
 
         } catch (parseError) {
-            console.error(`[LỖI JSON]: Không thể đọc kết quả từ Python. Chi tiết: ${stdout}`);
-            res.status(500).json({ error: 'Lỗi định dạng dữ liệu trả về' });
+            console.error(`[JSON PARSE ERROR]: Không thể đọc JSON từ: ${stdout}`);
+            res.status(500).json({ error: "Lỗi định dạng dữ liệu trả về từ Python" });
         }
     });
 });
@@ -93,45 +101,40 @@ app.post('/api/run-scoring', (req, res) => {
     const pythonCommand = `python run_scoring_api.py --data "${filepath}" --config "${configPath}"`;
 
     exec(pythonCommand, (error, stdout, stderr) => {
+        if (stderr) console.error(`[PYTHON STDERR]: ${stderr}`); // In lỗi từ Python nếu có
+
         if (error) {
-            console.error(`[LỖI PYTHON]: ${error.message}`);
-            return res.status(500).json({ error: 'Thuật toán Python bị lỗi trong quá trình chạy.' });
+            console.error(`[EXEC ERROR]: ${error.message}`);
+            return res.status(500).json({ error: 'Lỗi thực thi chấm điểm' });
         }
 
         try {
-            // Đọc JSON do Python in ra
+            console.log(`[DEBUG] Kết quả Python: ${stdout}`);
+            
             const jsonStartIndex = stdout.indexOf('{');
             const jsonEndIndex = stdout.lastIndexOf('}');
-            
-            if (jsonStartIndex === -1 || jsonEndIndex === -1) {
-                throw new Error("Không tìm thấy cấu trúc JSON trong kết quả trả về của Python.");
-            }
-            
             const cleanJsonString = stdout.substring(jsonStartIndex, jsonEndIndex + 1);
             const result = JSON.parse(cleanJsonString);
 
-            if (result.error) {
-                console.error(`[BÁO LỖI LOGIC]:`, result.error);
-                return res.status(400).json({ error: result.error });
-            }
-
-            // Trả kết quả về cho Frontend hiển thị
             res.json({
-                final_score: result.final_score || 0,
+                final_score: result.final_score,
                 health_status: (result.final_score >= 80) ? "Tốt" : (result.final_score >= 60 ? "Khá" : "Kém"),
-                dimension_scores: {
-                    completeness: result.dimension_scores?.completeness?.score || result.dimension_scores?.completeness || 0,
-                    accuracy: result.dimension_scores?.accuracy?.score || result.dimension_scores?.accuracy || 0,
-                    consistency: result.dimension_scores?.consistency?.score || result.dimension_scores?.consistency || 0
-                }
+                dimension_scores: result.dimension_scores
             });
-
-        } catch (parseError) {
-            console.error(`[LỖI JSON]: Không thể đọc kết quả từ Python. Chi tiết Output: \n${stdout}`);
-            res.status(500).json({ error: 'Lỗi định dạng dữ liệu trả về từ lõi phân tích' });
+        } catch (e) {
+            console.error(`[PARSE ERROR]: ${e.message}. Raw output: ${stdout}`);
+            res.status(500).json({ error: 'Lỗi định dạng kết quả' });
         }
     });
 });
+
+// Route Trả về thư viện luật cho Frontend 
+app.get('/api/rule-library', (req, res) => {
+    const libraryPath = path.join(__dirname, '../configs/rule_library.json');
+    const library = JSON.parse(fs.readFileSync(libraryPath, 'utf8'));
+    res.json(library);
+});
+
 
 // Khởi động Server
 app.listen(PORT, () => {

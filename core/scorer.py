@@ -41,7 +41,7 @@ class Scorer:
         final_score = round(final_score, 2)
 
         # Phân loại Sức khỏe dữ liệu
-        health_status = "Tốt" if final_score >= 80 else ("Khá" if final_score >= 50 else "Kém")
+        health_status = "Tốt" if final_score >= 80 else ("Khá" if final_score >= 60 else "Kém")
 
         return {
             "dimension_scores": dimension_scores,

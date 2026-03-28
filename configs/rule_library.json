@@ -1,0 +1,48 @@
+{
+    "completeness": {
+        "required": {
+        "label": "Bắt buộc (Không được để trống)",
+        "type": "missing",
+        "allowed_null_percentage": 0
+        },
+        "optional_90": {
+        "label": "Cho phép trống tối đa 10%",
+        "type": "missing",
+        "allowed_null_percentage": 10
+        }
+    },
+    "accuracy": {
+        "email": {
+        "label": "Định dạng Email chuẩn",
+        "type": "regex",
+        "value": "^[\\w\\.-]+@[\\w\\.-]+\\.\\w+$"
+        },
+        "phone_vn": {
+        "label": "Số điện thoại (10 số)",
+        "type": "regex",
+        "value": "^(0|84)[0-9]{9}$"
+        },
+        "order_id": {
+        "label": "Mã đơn hàng (ORD-xxx)",
+        "type": "regex",
+        "value": "^ORD-[0-9]{5,10}$"
+        },
+        "positive_number": {
+        "label": "Giá trị phải > 0",
+        "type": "range",
+        "min": 0.01
+        }
+    },
+    "consistency": {
+        "delivery_after_order": {
+        "label": "Ngày giao hàng >= Ngày đặt hàng",
+        "type": "logic",
+        "value": "delivery_date >= order_date"
+        },
+        "birthday_past": {
+        "label": "Ngày sinh phải ở quá khứ",
+        "type": "logic",
+        "value": "birthday < today"
+        }
+    }
+}
