@@ -8,12 +8,17 @@ rules:
   accuracy:
     check_format:
       - column: email
-        regex: ^(0|84)[0-9]{9}$
-      - column: phone_number
         regex: ^[\w\.-]+@[\w\.-]+\.\w+$
-    check_range: []
+      - column: phone_number
+        regex: ^(0|84)[0-9]{9}$
+    check_range:
+      - column: age
+        min: 18
+        max: 100
     check_allowed_values: []
   consistency:
     check_logic:
-      - rule_name: check_age_birthday_past
-        condition: birthday < today
+      - rule_name: check_start_date_end_after_start
+        condition: end_date > start_date
+      - rule_name: check_end_date_end_after_start
+        condition: end_date > start_date

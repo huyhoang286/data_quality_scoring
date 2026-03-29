@@ -15,11 +15,34 @@ def get_columns(file_path):
 
         # Đọc metadata
         if file_path.endswith('.csv'):
-            df = pd.read_csv(file_path, nrows=0)
+            df = pd.read_csv(file_path, nrows=100)
         else:
-            df = pd.read_excel(file_path, nrows=0)
+            df = pd.read_excel(file_path, nrows=100)
         
-        columns = [{"name": str(col), "type": str(df[col].dtype)} for col in df.columns]
+        for col in df.columns:
+            if df[col].dtype == 'object':
+                try:
+                    df[col] = pd.to_datetime(df[col], format='mixed', errors='raise')
+                except (ValueError, TypeError):
+                    pass 
+
+        columns = []
+        for col in df.columns:
+            dtype_str = str(df[col].dtype)
+            if 'datetime' in dtype_str:
+                clean_type = 'datetime'
+            elif 'int' in dtype_str:
+                clean_type = 'integer'
+            elif 'float' in dtype_str:
+                clean_type = 'float'
+            else:
+                clean_type = 'string' 
+
+            columns.append({
+                "name": str(col),
+                "type": clean_type
+            })
+            
         return columns
 
     except Exception as e:

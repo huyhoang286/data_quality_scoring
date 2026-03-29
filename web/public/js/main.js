@@ -92,7 +92,6 @@ document.addEventListener('DOMContentLoaded', async () => {
                 <td><strong>${col.name}</strong></td>
                 <td><span class="badge">${col.type}</span></td>
                 <td><select class="rule-select" style="width:100%">${optionsHtml}</select></td>
-                <td><button type="button" class="btn-delete">❌</button></td>
             `;
             ruleTbody.appendChild(tr);
         });

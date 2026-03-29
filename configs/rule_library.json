@@ -1,48 +1,69 @@
 {
     "completeness": {
         "required": {
-        "label": "Bắt buộc (Không được để trống)",
-        "type": "missing",
-        "allowed_null_percentage": 0
+            "label": "Bắt buộc (Không được để trống)",
+            "type": "missing",
+            "allowed_null_percentage": 0
         },
         "optional_90": {
-        "label": "Cho phép trống tối đa 10%",
-        "type": "missing",
-        "allowed_null_percentage": 10
+            "label": "Cho phép trống tối đa 10%",
+            "type": "missing",
+            "allowed_null_percentage": 10
         }
     },
     "accuracy": {
         "email": {
-        "label": "Định dạng Email chuẩn",
-        "type": "regex",
-        "value": "^[\\w\\.-]+@[\\w\\.-]+\\.\\w+$"
+            "label": "Định dạng Email chuẩn",
+            "type": "regex",
+            "value": "^[\\w\\.-]+@[\\w\\.-]+\\.\\w+$"
         },
         "phone_vn": {
-        "label": "Số điện thoại (10 số)",
-        "type": "regex",
-        "value": "^(0|84)[0-9]{9}$"
+            "label": "Số điện thoại (10 số)",
+            "type": "regex",
+            "value": "^(0|84)[0-9]{9}$"
+        },
+        "cccd": {
+            "label": "CCCD (12 số)",
+            "type": "regex",
+            "value": "^([0-9]{12})$"
+        },
+        "tax_id": {
+            "label": "Mã số thuế (10-14 số)",
+            "type": "regex",
+            "value": "^[0-9]{10}(-[0-9]{3})?$"
         },
         "order_id": {
-        "label": "Mã đơn hàng (ORD-xxx)",
-        "type": "regex",
-        "value": "^ORD-[0-9]{5,10}$"
+            "label": "Mã đơn hàng (ORD-xxx)",
+            "type": "regex",
+            "value": "^ORD-[0-9]{5,10}$"
         },
         "positive_number": {
-        "label": "Giá trị phải > 0",
-        "type": "range",
-        "min": 0.01
+            "label": "Giá trị phải > 0",
+            "type": "range",
+            "min": 0.01
+        },
+        "valid_age": {
+            "label": "Tuổi hợp lệ (18 - 100)",
+            "type": "range",
+            "min": 18,
+            "max": 100
         }
     },
     "consistency": {
-        "delivery_after_order": {
-        "label": "Ngày giao hàng >= Ngày đặt hàng",
-        "type": "logic",
-        "value": "delivery_date >= order_date"
+        "end_after_start": {
+            "label": "Ngày kết thúc > Ngày bắt đầu",
+            "type": "logic",
+            "value": "end_date > start_date"
+        },
+        "sale_profit": {
+            "label": "Giá bán >= Giá gốc",
+            "type": "logic",
+            "value": "sale_price >= cost_price"
         },
         "birthday_past": {
-        "label": "Ngày sinh phải ở quá khứ",
-        "type": "logic",
-        "value": "birthday < today"
+            "label": "Ngày sinh",
+            "type": "logic",
+            "value": "birthday < today"
         }
     }
 }
