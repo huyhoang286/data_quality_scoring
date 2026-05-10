@@ -1,20 +1,25 @@
 rules:
   completeness:
     check_missing_values:
-      - column: id
+      - column: Transaction ID
+        allowed_null_percentage: 0
+      - column: Item
+        allowed_null_percentage: 0
+      - column: Payment Method
+        allowed_null_percentage: 0
+      - column: Location
+        allowed_null_percentage: 0
+      - column: Transaction Date
         allowed_null_percentage: 0
   accuracy:
-    check_format:
-      - column: phone_number
-        regex: ^(0|84)[0-9]{9}$
-      - column: email
-        regex: ^[\w\.-]+@[\w\.-]+\.\w+$
-      - column: cccd
-        regex: ^([0-9]{12})$
+    check_format: []
     check_range:
-      - column: age
-        min: 18
-        max: 100
+      - column: Quantity
+        min: 0.01
+      - column: Price Per Unit
+        min: 0.01
+      - column: Total Spent
+        min: 0.01
     check_allowed_values: []
   consistency:
     check_logic: []

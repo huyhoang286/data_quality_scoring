@@ -69,11 +69,12 @@ class RuleEngine:
             min_val = rule.get('min')
             max_val = rule.get('max')
             if col in self.df.columns:
+                numeric_series = pd.to_numeric(self.df[col], errors='coerce')
                 invalid_mask = pd.Series(False, index=self.df.index)
                 if min_val is not None:
-                    invalid_mask = invalid_mask | (self.df[col] < min_val)
+                    invalid_mask = invalid_mask | (numeric_series < min_val)
                 if max_val is not None:
-                    invalid_mask = invalid_mask | (self.df[col] > max_val)
+                    invalid_mask = invalid_mask | (numeric_series > max_val)
                     
                 invalid_count = invalid_mask.sum()
                 self.results["accuracy"][f"{col}_range"] = {
