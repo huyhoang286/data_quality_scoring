@@ -42,6 +42,57 @@ document.addEventListener('DOMContentLoaded', async () => {
             }
 
             renderRuleTable(data.columns);
+            // --- THÊM PHẦN NÚT AI ---
+            const btnAI = document.createElement('button');
+            btnAI.id = 'btn-ai-suggest';
+            btnAI.className = 'btn';
+            btnAI.style.cssText = 'background: linear-gradient(90deg, #8A2BE2, #4B0082); color: white; margin-bottom: 15px; font-weight: bold; border: none; padding: 10px 15px; cursor: pointer; border-radius: 5px;';
+            btnAI.innerHTML = '✨ Nhờ AI tự động chọn Luật';
+            
+            // Chèn nút AI 
+            ruleTbody.parentElement.parentElement.insertBefore(btnAI, ruleTbody.parentElement);
+
+            btnAI.addEventListener('click', async () => {
+                const originalText = btnAI.innerHTML;
+                btnAI.innerHTML = '⏳ AI đang quét và phân tích...';
+                btnAI.disabled = true;
+
+                try {
+                    const aiRes = await fetch('/api/ai-suggest', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ columns: data.columns })
+                    });
+                    const mapping = await aiRes.json();
+                    
+                    if (mapping.error) throw new Error(mapping.error);
+
+                    // Lặp qua bảng và gán giá trị
+                    document.querySelectorAll('#rule-tbody tr').forEach(row => {
+                        const colName = row.querySelector('td strong').innerText;
+                        const selectEl = row.querySelector('.rule-select');
+                        
+                        if (mapping[colName]) {
+                            let formattedValue = mapping[colName]
+                                .replace('completeness:', 'comp:')
+                                .replace('accuracy:', 'acc:')
+                                .replace('consistency:', 'cons:');
+                                
+                            selectEl.value = formattedValue;
+                            
+                            selectEl.style.backgroundColor = "#e0c4f8";
+                            setTimeout(() => selectEl.style.backgroundColor = "", 2000);
+                        }
+                    });
+
+                } catch (e) {
+                    alert('Lỗi AI: ' + e.message);
+                } finally {
+                    btnAI.innerHTML = originalText;
+                    btnAI.disabled = false;
+                }
+            });
+            // --- KẾT THÚC PHẦN NÚT AI ---
             ruleBuilderSection.classList.remove('hidden');
             statusMessage.textContent = `Đã nhận file: ${file.name}`;
             statusMessage.classList.remove('hidden');

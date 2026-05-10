@@ -3,10 +3,6 @@ rules:
     check_missing_values:
       - column: id
         allowed_null_percentage: 0
-      - column: name
-        allowed_null_percentage: 10
-      - column: address
-        allowed_null_percentage: 10
   accuracy:
     check_format:
       - column: phone_number

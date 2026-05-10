@@ -1,4 +1,6 @@
 require('dotenv').config();
+const { GoogleGenerativeAI } = require('@google/generative-ai');
+const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 const express = require('express');
 const multer = require('multer');
 const path = require('path');
@@ -135,6 +137,50 @@ app.get('/api/rule-library', (req, res) => {
     res.json(library);
 });
 
+// API Gợi ý luật bằng AI
+app.post('/api/ai-suggest', async (req, res) => {
+    try {
+        const { columns } = req.body;
+        
+        // Đọc thư viện luật hiện tại
+        const libraryPath = path.join(__dirname, '../configs/rule_library.json');
+        const ruleLibrary = JSON.parse(fs.readFileSync(libraryPath, 'utf8'));
+
+        // Xây dựng Prompt cho AI
+        const prompt = `
+        Bạn là một chuyên gia Data Engineer. 
+        Tôi có một tập dữ liệu với các cột sau (kèm kiểu dữ liệu và giá trị mẫu):
+        ${JSON.stringify(columns, null, 2)}
+
+        Và đây là danh sách các luật kiểm tra dữ liệu tôi đang có:
+        ${JSON.stringify(ruleLibrary, null, 2)}
+
+        NHIỆM VỤ: Hãy tự động ánh xạ (map) mỗi cột với MỘT luật phù hợp nhất trong thư viện luật. 
+        Nếu cột đó không cần kiểm tra (ví dụ tên người, địa chỉ thông thường), hãy bỏ qua nó.
+
+        ĐỊNH DẠNG ĐẦU RA (BẮT BUỘC):
+        Chỉ trả về DUY NHẤT một chuỗi JSON hợp lệ, không có markdown, không giải thích. 
+        Cấu trúc JSON: { "tên_cột": "nhóm_luật:tên_luật" }
+        Ví dụ: { "email": "accuracy:email", "age": "accuracy:valid_age", "start_date": "completeness:required" }
+        `;
+
+        console.log("[AI] Đang gọi Gemini suy luận...");
+        const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
+        const result = await model.generateContent(prompt);
+        let aiText = result.response.text();
+        
+        aiText = aiText.replace(/```json/g, '').replace(/```/g, '').trim();
+        
+        const mapping = JSON.parse(aiText);
+        console.log("[AI] Gợi ý thành công:", mapping);
+        
+        res.json(mapping);
+
+    } catch (error) {
+        console.error("[AI LỖI]:", error);
+        res.status(500).json({ error: "AI không thể gợi ý lúc này." });
+    }
+});
 
 // Khởi động Server
 app.listen(PORT, () => {

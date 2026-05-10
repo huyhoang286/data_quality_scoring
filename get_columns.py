@@ -4,7 +4,6 @@ import sys
 import io
 import os
 
-# UTF-8 cho Windows
 sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8')
 sys.stderr = io.TextIOWrapper(sys.stderr.buffer, encoding='utf-8')
 
@@ -38,9 +37,12 @@ def get_columns(file_path):
             else:
                 clean_type = 'string' 
 
+            samples = df[col].dropna().astype(str).head(3).tolist() # Lấy 3 mẫu dữ liệu đầu tiên cho AI
+
             columns.append({
                 "name": str(col),
-                "type": clean_type
+                "type": clean_type,
+                "samples": samples
             })
             
         return columns
