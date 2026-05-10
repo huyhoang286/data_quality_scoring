@@ -88,6 +88,7 @@ class RuleEngine:
         for rule in logic_rules:
             rule_name = rule['rule_name']
             condition = rule['condition'] 
+            today = pd.Timestamp.today()
             
             try:
                 for col in self.df.columns:

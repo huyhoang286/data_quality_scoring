@@ -1,25 +1,27 @@
 rules:
   completeness:
     check_missing_values:
-      - column: Transaction ID
+      - column: Customer ID
+        allowed_null_percentage: 0
+      - column: Category
         allowed_null_percentage: 0
       - column: Item
         allowed_null_percentage: 0
       - column: Payment Method
         allowed_null_percentage: 0
-      - column: Location
-        allowed_null_percentage: 0
-      - column: Transaction Date
-        allowed_null_percentage: 0
   accuracy:
-    check_format: []
+    check_format:
+      - column: Order ID
+        regex: ^ORD-[0-9]{5,10}$
     check_range:
+      - column: Price
+        min: 0.01
       - column: Quantity
         min: 0.01
-      - column: Price Per Unit
-        min: 0.01
-      - column: Total Spent
+      - column: Order Total
         min: 0.01
     check_allowed_values: []
   consistency:
-    check_logic: []
+    check_logic:
+      - rule_name: check_Order Date_order_past
+        condition: order_date <= @today

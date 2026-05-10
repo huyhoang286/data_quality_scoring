@@ -90,7 +90,12 @@
         "birthday_past": {
             "label": "Ngày sinh",
             "type": "logic",
-            "value": "birthday < today"
+            "value": "birthday < @today"
+        },
+        "order_past": {
+            "label": "Ngày đặt hàng <= Hôm nay",
+            "type": "logic",
+            "value": "order_date <= @today"
         },
         "delivery_timeline": {
             "label": "Ngày nhận >= Ngày xuất kho",
