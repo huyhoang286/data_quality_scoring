@@ -47,6 +47,33 @@
             "type": "range",
             "min": 18,
             "max": 100
+        },
+        "website_url": {
+            "label": "Định dạng Link Website",
+            "type": "regex",
+            "value": "^https?:\\/\\/(?:www\\.)?[-a-zA-Z0-9@:%._\\+~#=]{1,256}\\.[a-zA-Z0-9()]{1,6}\\b(?:[-a-zA-Z0-9()@:%_\\+.~#?&\\/=]*)$"
+        },
+        "product_sku": {
+            "label": "Mã sản phẩm/SKU (VD: SP-123)",
+            "type": "regex",
+            "value": "^[A-Z0-9]+-[A-Z0-9]+$"
+        },
+        "ipv4_address": {
+            "label": "Địa chỉ IPv4",
+            "type": "regex",
+            "value": "^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$"
+        },
+        "valid_discount_percent": {
+            "label": "Phần trăm giảm giá (0-100)",
+            "type": "range",
+            "min": 0,
+            "max": 100
+        },
+        "rating_5_stars": {
+            "label": "Đánh giá sao (1-5)",
+            "type": "range",
+            "min": 1,
+            "max": 5
         }
     },
     "consistency": {
@@ -64,6 +91,21 @@
             "label": "Ngày sinh",
             "type": "logic",
             "value": "birthday < today"
+        },
+        "delivery_timeline": {
+            "label": "Ngày nhận >= Ngày xuất kho",
+            "type": "logic",
+            "value": "delivered_date >= shipped_date"
+        },
+        "inventory_logic": {
+            "label": "SL Nhập >= SL Bán ra",
+            "type": "logic",
+            "value": "qty_imported >= qty_sold"
+        },
+        "discount_logic": {
+            "label": "Giá gốc > Giá khuyến mãi",
+            "type": "logic",
+            "value": "original_price > discount_price"
         }
     }
 }
